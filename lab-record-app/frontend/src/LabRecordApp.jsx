@@ -98,6 +98,15 @@ function parsePSGLabPDF(rawText) {
         rollNoLower.includes('department') ||
         studentInfo.rollNo.length > 20) {
       studentInfo.rollNo = "";
+    } else {
+      // Extract only digits from the register number
+      const digitsOnly = studentInfo.rollNo.replace(/\D/g, "");
+      // If the extracted digits are not exactly 12, clear it (user will enter manually)
+      if (digitsOnly.length !== 12) {
+        studentInfo.rollNo = "";
+      } else {
+        studentInfo.rollNo = digitsOnly;
+      }
     }
   }
 
@@ -140,24 +149,32 @@ function parsePSGLabPDF(rawText) {
 
   const isQuestionStart = (line, nextLine, lookaheadLines) => {
     if (!line) return false;
-    if (/^question\s*\d+/i.test(line)) return true;
+    
+    // Explicit "Question N" or "Problem N" headers are always question starts
+    if (/^question\s*\d+/i.test(line) || /^problem\s*\d+/i.test(line)) return true;
+    
+    // For numbered lines like "1.", "2.", etc.
     const m = line.match(/^(\d{1,2})\.(.*)$/);
     if (!m) return false;
 
     const rest = (m[2] || "").trim();
-    if (/^(?:problem\s*statement)?$/i.test(rest)) return true;
-    if (/^problem\s*statement\b/i.test(rest)) return true;
+    
+    // If the line is "1." or "1. Problem Statement" alone, likely a question
+    if (!rest || /^problem\s*statement\b/i.test(rest)) return true;
 
     const nl = (nextLine || "").trim();
+    
+    // Check only the next 1-2 lines (not 6) for "problem statement"
+    // This is more conservative - "Problem Statement" should come very soon after the number
     if (/^problem\s*statement\b/i.test(nl)) return true;
+    const line2After = (lookaheadLines && lookaheadLines[1] || "").trim();
+    if (/^problem\s*statement\b/i.test(line2After)) return true;
 
-    const ahead = (lookaheadLines || []).slice(0, 6).join("\n");
-    if (/\bproblem\s*statement\b/i.test(ahead)) return true;
-    if (/\binput\s*format\b/i.test(ahead)) return true;
-    if (/\boutput\s*format\b/i.test(ahead)) return true;
-    if (/\bsample\s*test\s*case\b/i.test(ahead)) return true;
-    if (/^status\s*:/gmi.test(ahead)) return true;
-    if (/^marks\s*:/gmi.test(ahead)) return true;
+    // Only if the next line itself starts with these keywords, consider it a question
+    // Don't look ahead 6 lines - that's too broad
+    if (/^input\s*format\b/i.test(nl) || /^output\s*format\b/i.test(nl) || /^sample\s*test\s*case\b/i.test(nl)) return true;
+    if (/^status\s*:/i.test(nl) || /^marks\s*:/i.test(nl)) return true;
+    
     return false;
   };
 
@@ -199,7 +216,51 @@ function parsePSGLabPDF(rawText) {
 
     const bodyStart = psStart !== -1 ? psStart + 1 : 1;
     const bodyEnd = stcStart !== -1 ? stcStart : cl.length;
-    const problemStatement = dropTrailingMeta(cl.slice(bodyStart, bodyEnd)).join("\n").trim();
+    
+    // Filter out CSV data rows and CSV file headers
+    const isCSVDataRow = (line) => {
+      const trimmed = line.trim();
+      
+      // Skip CSV filenames like "data.csv", "data1.csv", "main.py", etc.
+      if (/\.(csv|py|txt|json)$/i.test(trimmed)) return true;
+      
+      // Skip CSV headers like "x,y" or "age,sex,cp,trestbps,chol,..."
+      if (/^[a-z_]+(?:,[a-z_\s]+)+$/i.test(trimmed) && trimmed.split(',').length >= 2) {
+        const parts = trimmed.split(',');
+        // If all parts are short words (< 20 chars each), likely a CSV header
+        if (parts.every(p => p.trim().length < 20 && !/^\d/.test(p.trim()))) {
+          return true;
+        }
+      }
+      
+      // Skip CSV data rows - lines that are mostly numbers and commas
+      const separators = (trimmed.match(/,/g) || []).length;
+      if (separators === 0) return false; // Not CSV if no commas
+      
+      // Check if line is mostly numeric data with commas
+      const parts = trimmed.split(',');
+      if (parts.length > 3) {
+        const numericParts = parts.filter(p => /^[\d.\-:]+$/.test(p.trim())).length;
+        const ratio = numericParts / parts.length;
+        if (ratio > 0.7) return true; // 70% numeric = CSV data row
+      }
+      
+      return false;
+    };
+    
+    const filteredClForPS = cl.slice(bodyStart, bodyEnd).filter(l => !isCSVDataRow(l.trim()));
+    
+    // Find the end of actual problem statement (stop before Answer section or CSV filename)
+    let psEndIdx = filteredClForPS.length;
+    for (let i = 0; i < filteredClForPS.length; i++) {
+      const line = filteredClForPS[i].trim();
+      if (/^answer\b|^main\.py\b|^data\d*\.csv\b/i.test(line)) {
+        psEndIdx = i;
+        break;
+      }
+    }
+    
+    const problemStatement = dropTrailingMeta(filteredClForPS.slice(0, psEndIdx)).join("\n").trim();
     const testCase = stcStart !== -1
       ? dropTrailingMeta(cl.slice(stcStart + 1, ansStart !== -1 ? ansStart : cl.length)).join("\n").trim()
       : "";
@@ -232,13 +293,15 @@ export default function LabRecordApp() {
   const [downloading, setDownloading] = useState(false);
 
   const [parsedStudent, setParsedStudent] = useState(null);
-  const [labInfo, setLabInfo]   = useState({ institution:"", labName:"", weekNo:"", experimentTitle:"", date:"", totalMarks:"" });
+  const [labInfo, setLabInfo]   = useState({ institution:"", labName:"", recordName:"", weekNo:"", experimentTitle:"", date:"", totalMarks:"" });
   const [qaList, setQaList]     = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState(new Set());
   const [rubric, setRubric]     = useState(rubricDefaults.map(r => ({ ...r })));
   const [includeTestCases, setIncludeTestCases] = useState(false);
+  const [aim, setAim]           = useState("");
   const [result, setResult]     = useState("");
   const [manualRollNo, setManualRollNo] = useState("");
+  const [showValidation, setShowValidation] = useState(false);
 
   const fileInputRef = useRef();
 
@@ -259,7 +322,7 @@ export default function LabRecordApp() {
       const text = await extractTextFromPDF(pdfFile);
       const { studentInfo: si, labInfo: li, questions } = parsePSGLabPDF(text);
       setParsedStudent(si);
-      setLabInfo(li);
+      setLabInfo({...li, recordName: li.labName});
       setManualRollNo(si.rollNo || "");
       const questionsWithId = questions.map((q, i) => ({ ...q, id: i }));
       setQaList(questionsWithId);
@@ -281,20 +344,23 @@ export default function LabRecordApp() {
     setRubric(r => r.map((row, i) => i === idx ? { ...row, [field]: val } : row));
 
   const si = parsedStudent || { name:"", rollNo:"", email:"", phone:"", branch:"", department:"", batch:"", degree:"" };
+  const hasValid12DigitRollNo = si.rollNo && /^\d{12}$/.test(si.rollNo);
   const effectiveRollNo = manualRollNo || si.rollNo || "";
+  const rollNoIsValid = /^\d{12}$/.test(effectiveRollNo.replace(/\s/g, ""));
   const totalObtained  = qaList.reduce((s, q) => s + (parseFloat(q.marksObtained) || 0), 0);
   const totalMax       = qaList.reduce((s, q) => s + (parseFloat(q.maxMarks) || 0), 0);
   const rubricObtained = rubric.reduce((s, r) => s + (parseFloat(r.obtained) || 0), 0);
   const rubricMax      = rubric.reduce((s, r) => s + (parseFloat(r.maxMarks) || 0), 0);
 
   const resetAll = () => {
-    setStep(0); setPdfFile(null); setQaList([]); setResult("");
+    setStep(0); setPdfFile(null); setQaList([]); setAim(""); setResult("");
     setParsedStudent(null);
     setManualRollNo("");
     setRubric(rubricDefaults.map(r => ({ ...r })));
-    setLabInfo({ institution:"", labName:"", weekNo:"", experimentTitle:"", date:"", totalMarks:"" });
+    setLabInfo({ institution:"", labName:"", recordName:"", weekNo:"", experimentTitle:"", date:"", totalMarks:"" });
     setIncludeTestCases(false);
     setSelectedQuestions(new Set());
+    setShowValidation(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -536,6 +602,9 @@ export default function LabRecordApp() {
         .inp-group label{font-size:.77rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888}
         .inp-group input,.inp-group textarea{border:1.5px solid #d4cec6;padding:9px 12px;font-size:1.025rem;font-family:'DM Sans',sans-serif;background:#faf8f5;color:#1c1c1c;outline:none;width:100%;transition:border-color .15s}
         .inp-group input:focus,.inp-group textarea:focus{border-color:#1c1c1c;background:#fff}
+        .inp-group .required-star{color:#c0392b;margin-left:3px;font-size:.9rem}
+        .inp-group.invalid input,.inp-group.invalid textarea{border-color:#c0392b;background:#fef5f5}
+        .validation-msg{color:#c0392b;font-size:.82rem;margin-top:4px;font-weight:500}
         .inp-group textarea{resize:vertical;min-height:84px}
         .inp-group.result-textarea{width:100%;min-height:120px;border:1px solid #ccc;padding:12px 16px;font-size:1.15rem;font-family:'DM Sans',sans-serif;font-weight:400;line-height:1.6;resize:vertical;outline:none;border-radius:4px;box-sizing:border-box}
         .test-case-check{margin-top:14px}
@@ -611,7 +680,7 @@ export default function LabRecordApp() {
         .ps-text{font-family:'IBM Plex Mono',monospace;font-size:14pt;line-height:1.6;color:#000;white-space:pre-wrap;background:transparent;margin:6px 0 0 0;padding:0;border:none;page-break-inside:avoid;break-inside:avoid}
         .pr-result{margin:18px 0;padding:0;page-break-inside:avoid;break-inside:avoid}
         .section-hd{font-size:.71rem;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;color:#555;margin-bottom:10px}
-        .pr-result-text{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:25pt;line-height:1.4;color:#000}
+        .pr-result-text{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:14pt;line-height:1.4;color:#000}
         .pr-result-write{min-height:90px;border:1px solid #1c1c1c;padding:10px 12px;white-space:pre-wrap;break-inside:avoid;page-break-inside:avoid}
         .pr-rubric{margin-bottom:0;page-break-inside:avoid;break-inside:avoid}
         .pr-rubric, .pr-rubric *{font-size:16pt}
@@ -717,21 +786,34 @@ export default function LabRecordApp() {
             <div className="card">
               <div className="card-title">Experiment Details</div>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-                <div className="inp-group">
-                  <label>Week (e.g. Week 1)</label>
+                <div className={`inp-group${showValidation && !labInfo.weekNo.trim() ? ' invalid' : ''}`}>
+                  <label>Week (e.g. Week 1)<span className="required-star">*</span></label>
                   <input type="text" value={labInfo.weekNo} onChange={e => updateLab("weekNo", e.target.value)} placeholder="Week 1" />
+                  {showValidation && !labInfo.weekNo.trim() && <div className="validation-msg">Week is required</div>}
                 </div>
-                <div className="inp-group">
-                  <label>Program / Experiment Name</label>
+                <div className={`inp-group${showValidation && !labInfo.experimentTitle.trim() ? ' invalid' : ''}`}>
+                  <label>Program / Experiment Name<span className="required-star">*</span></label>
                   <input type="text" value={labInfo.experimentTitle} onChange={e => updateLab("experimentTitle", e.target.value)} placeholder="e.g. COD" />
+                  {showValidation && !labInfo.experimentTitle.trim() && <div className="validation-msg">Program / Experiment Name is required</div>}
                 </div>
-                <div className="inp-group">
-                  <label>Register Number {parsedStudent?.rollNo && parsedStudent.rollNo.trim() ? "(from PDF)" : "(not found in PDF — enter manually)"}</label>
-                  {parsedStudent?.rollNo && parsedStudent.rollNo.trim() ? (
+                <div className={`inp-group${showValidation && !effectiveRollNo.trim() ? ' invalid' : ''} ${showValidation && effectiveRollNo.trim() && !rollNoIsValid ? ' invalid' : ''}`}>
+                  <label>Register Number<span className="required-star">*</span> {hasValid12DigitRollNo ? "(from PDF - 12 digits)" : "(enter 12 digits)"}</label>
+                  {hasValid12DigitRollNo ? (
                     <input type="text" value={manualRollNo} readOnly style={{backgroundColor:"#f0f0f0",cursor:"not-allowed",color:"#555"}} />
                   ) : (
-                    <input type="text" value={manualRollNo} onChange={e => setManualRollNo(e.target.value)} placeholder="e.g. 715524104007" />
+                    <input type="text" value={manualRollNo} onChange={e => {
+                      // Allow only digits
+                      const digitsOnly = e.target.value.replace(/\D/g, "");
+                      setManualRollNo(digitsOnly.slice(0, 12));
+                    }} placeholder="715524104007 (12 digits only)" maxLength="12" />
                   )}
+                  {showValidation && !effectiveRollNo.trim() && <div className="validation-msg">Register Number is required</div>}
+                  {showValidation && effectiveRollNo.trim() && !rollNoIsValid && <div className="validation-msg">Register Number must be exactly 12 digits with no letters or special characters</div>}
+                </div>
+                <div className={`inp-group${showValidation && !labInfo.recordName.trim() ? ' invalid' : ''}`}>
+                  <label>Lab Record Name<span className="required-star">*</span></label>
+                  <input type="text" value={labInfo.recordName} onChange={e => updateLab("recordName", e.target.value)} placeholder="e.g. PYTHON Lab, Java Programming Lab" />
+                  {showValidation && !labInfo.recordName.trim() && <div className="validation-msg">Lab Record Name is required</div>}
                 </div>
               </div>
             </div>
@@ -746,13 +828,6 @@ export default function LabRecordApp() {
                     style={{padding:"6px 12px",fontSize:".85rem"}}
                   >
                     Select All
-                  </button>
-                  <button 
-                    className="btn" 
-                    onClick={() => setSelectedQuestions(new Set())}
-                    style={{padding:"6px 12px",fontSize:".85rem"}}
-                  >
-                    Deselect All
                   </button>
                 </div>
               </div>
@@ -770,6 +845,8 @@ export default function LabRecordApp() {
                           if (e.target.checked) {
                             newSelected.add(qa.id);
                           } else {
+                            // Don't allow deselecting if only one question is selected
+                            if (selectedQuestions.size === 1) return;
                             newSelected.delete(qa.id);
                           }
                           setSelectedQuestions(newSelected);
@@ -787,7 +864,7 @@ export default function LabRecordApp() {
                 </div>
               ))}
               <div style={{ display:"flex", justifyContent:"space-between", paddingTop:10, gap:8, alignItems:"center" }}>
-                <span style={{ fontSize:".85rem", color:"#666" }}>Selected: {selectedQuestions.size} of {qaList.length} questions</span>
+                <span style={{ fontSize:".85rem", color:selectedQuestions.size === 0 ? "#c0392b" : "#666" }}>Selected: {selectedQuestions.size} of {qaList.length} questions {selectedQuestions.size === 0 && <span style={{fontWeight:700}}>— Select at least one question</span>}</span>
                 <div style={{ display:"flex", gap:8, alignItems:"center" }}>
                   <span style={{ fontSize:".93rem", color:"#888" }}>Total marks:</span>
                   <strong style={{ fontFamily:"'IBM Plex Mono',monospace", fontSize:"1.15rem" }}>{totalObtained} / {totalMax}</strong>
@@ -795,9 +872,18 @@ export default function LabRecordApp() {
               </div>
             </div>
 
+            <div className="card">
+              <div className="card-title">Section B — Aim</div>
+              <div className="inp-group">
+                <label>Aim</label>
+                <textarea value={aim} onChange={e => setAim(e.target.value)}
+                  placeholder="e.g. To understand and implement basic Python programming concepts including loops, conditionals, and functions."
+                  style={{ minHeight:96 }} />
+              </div>
+            </div>
 
             <div className="card">
-              <div className="card-title">Section B — Result</div>
+              <div className="card-title">Section C — Result</div>
               <div className="inp-group">
                 <label>Result</label>
                 <textarea value={result} onChange={e => setResult(e.target.value)}
@@ -807,7 +893,7 @@ export default function LabRecordApp() {
             </div>
 
             <div className="card">
-              <div className="card-title">Section C — Sample Test Cases (Auto-Extracted {qaList.some(q => q.testCase && q.testCase.trim()) ? "✓" : ""})</div>
+              <div className="card-title">Section D — Sample Test Cases (Auto-Extracted {qaList.some(q => q.testCase && q.testCase.trim()) ? "✓" : ""})</div>
               {qaList.some(q => q.testCase && q.testCase.trim()) ? (
                 <div>
                   <label style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer",fontSize:"1.025rem",fontWeight:500,marginBottom:12}}>
@@ -833,7 +919,12 @@ export default function LabRecordApp() {
               <button className="btn" onClick={() => setStep(0)}>← Re-upload</button>
               <div style={{display:"flex",gap:10}}>
                 <button className="btn" onClick={resetAll}>New Record</button>
-                <button className="btn btn-filled" onClick={handleDownloadPDF} disabled={downloading}>
+                <button className="btn btn-filled" onClick={() => {
+                  const isValid = labInfo.weekNo.trim() && labInfo.experimentTitle.trim() && manualRollNo.trim() && /^\d{12}$/.test(manualRollNo) && labInfo.recordName.trim();
+                  if (!isValid) { setShowValidation(true); return; }
+                  setShowValidation(false);
+                  handleDownloadPDF();
+                }} disabled={downloading}>
                   {downloading ? <><span className="spin" />Generating…</> : "⬇ Download PDF"}
                 </button>
               </div>
@@ -866,7 +957,7 @@ export default function LabRecordApp() {
                       <div className="pr-header">
                         <div className="pr-inst">{labInfo.institution || "PSG Institute of Technology and Applied Research"}</div>
                         <div className="pr-subtitle">Laboratory Record</div>
-                        <div className="pr-lab">{labInfo.labName || "PYTHON Lab"}</div>
+                        <div className="pr-lab">{labInfo.recordName || labInfo.labName || "PYTHON Lab"}</div>
                       </div>
 
                       <div className="info-strip">
@@ -897,7 +988,7 @@ export default function LabRecordApp() {
 
                       <div style={{marginBottom:12}}>
                         <div style={{fontSize:".9rem",fontWeight:700,letterSpacing:"1.2px",textTransform:"uppercase",color:"#888",marginBottom:6}}>Aim:</div>
-                        <div style={{minHeight:"80px"}}></div>
+                        <div style={{minHeight:"80px",whiteSpace:"pre-wrap",lineHeight:1.6,fontSize:"14pt"}}>{aim || "\n\n\n"}</div>
                       </div>
 
                       {qaList.filter(qa => selectedQuestions.has(qa.id)).map((qa, idx) => (
