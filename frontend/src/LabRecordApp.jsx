@@ -1151,11 +1151,11 @@ export default function LabRecordApp() {
                         </div>
                       ))}
 
-                      <div style={{marginBottom:18, display:"flex", gap:24, alignItems:"flex-start"}}>
-                        <div className="pr-rubric" data-pdf-keep-together="true" style={{flex:"0 0 50%", marginLeft:32, background:"#fff",position:"relative",zIndex:2,padding:"16px",boxShadow:"0 0 0 20px #fff",outline:"20px solid #fff"}}>
+                      <div style={{marginBottom:18, display:"flex", gap:24, alignItems:"flex-start", pageBreakInside:"avoid", breakInside:"avoid"}}>
+                        <div className="pr-rubric" data-pdf-keep-together="true" style={{flex:"0 0 50%", marginLeft:32, background:"#fff",position:"relative",zIndex:2,padding:"16px",boxShadow:"0 0 0 20px #fff",outline:"20px solid #fff", pageBreakInside:"avoid", breakInside:"avoid"}}>
                           <img src="/Rubrics.png" alt="Marks Rubric" style={{maxWidth:"100%",height:"auto",display:"block",opacity:1,backgroundColor:"#fff",position:"relative",zIndex:3}} />
                         </div>
-                        <div style={{textAlign:"right", flex:"1"}}>
+                        <div style={{textAlign:"right", flex:"1", pageBreakInside:"avoid", breakInside:"avoid"}}>
                           <div style={{fontSize:"12pt",fontWeight:700,letterSpacing:"1.2px",textTransform:"uppercase",color:"#888",marginBottom:6}}>Total Score</div>
                           <div style={{fontSize:"15pt",fontWeight:700,fontFamily:"Calibri, 'Segoe UI', Arial, sans-serif"}}>{totalObtained}/{totalMax}</div>
                         </div>
