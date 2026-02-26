@@ -487,7 +487,7 @@ export default function LabRecordApp() {
           const lx = (pageW - logoWidth) / 2;
           const ly = (pageH - logoHeight) / 2;
           doc.saveGraphicsState();
-          doc.setGState(new doc.GState({ opacity: 0.2 }));
+          doc.setGState(new doc.GState({ opacity: 0.1 }));
           doc.addImage(logoImg, 'PNG', lx, ly, logoWidth, logoHeight);
           doc.restoreGraphicsState();
         }
@@ -496,7 +496,7 @@ export default function LabRecordApp() {
         const regNo = effectiveRollNo || '';
         if (regNo) {
           doc.saveGraphicsState();
-          doc.setGState(new doc.GState({ opacity: 0.15 }));
+          doc.setGState(new doc.GState({ opacity: 0.3 }));
           doc.setFontSize(9);
           doc.setTextColor(0, 0, 0);
           doc.text(regNo, 8, 9);
@@ -634,17 +634,17 @@ export default function LabRecordApp() {
         .pr-page-inner{position:relative;height:auto;width:100%;display:flex;flex-direction:column}
         .print-page-border{position:fixed;top:10mm;left:10mm;right:10mm;bottom:10mm;border:2px solid #1c1c1c;z-index:1;pointer-events:none;display:none}
 
-        .page-wm-reg{position:absolute;font-size:0.7rem;font-weight:600;opacity:0.15;color:#000;pointer-events:none;z-index:0;font-family:'IBM Plex Mono',monospace !important;letter-spacing:1px}
+        .page-wm-reg{position:absolute;font-size:0.7rem;font-weight:600;opacity:0.3;color:#000;pointer-events:none;z-index:0;font-family:'IBM Plex Mono',monospace !important;letter-spacing:1px}
         .page-wm-reg.wm-tl{top:2mm;left:2mm}.page-wm-reg.wm-tr{top:2mm;right:2mm}.page-wm-reg.wm-bl{bottom:2mm;left:2mm}.page-wm-reg.wm-br{bottom:2mm;right:2mm}
         .print-fixed-wm{display:none;position:fixed;pointer-events:none;z-index:9999}
 
-        .print-fixed-reg{font-size:0.7rem;font-weight:600;opacity:0.15;color:#000;font-family:'IBM Plex Mono',monospace !important;letter-spacing:1px}
+        .print-fixed-reg{font-size:0.7rem;font-weight:600;opacity:0.3;color:#000;font-family:'IBM Plex Mono',monospace !important;letter-spacing:1px}
         .print-fixed-reg.wm-tl{top:12mm;left:12mm}.print-fixed-reg.wm-tr{top:12mm;right:12mm}.print-fixed-reg.wm-bl{bottom:12mm;left:12mm}.print-fixed-reg.wm-br{bottom:12mm;right:12mm}
         .pdf-hide{visibility:visible}
         .pdf-generating .pdf-hide{visibility:hidden !important}
         .pdf-generating .pr-page{box-shadow:none !important}
         .pdf-generating .pr-page::before{display:none !important}
-        .pr-content-wrapper{position:relative;z-index:3;flex:1;overflow:visible;font-size:14pt;line-height:1.5;font-family:Calibri, 'Segoe UI', Arial, sans-serif;color:#000;background:#ffffff}
+        .pr-content-wrapper{position:relative;z-index:3;flex:1;overflow:visible;font-size:12pt;line-height:1.5;font-family:Calibri, 'Segoe UI', Arial, sans-serif;color:#000;background:#ffffff}
         .pr-content-wrapper *{color:#000 !important;font-family:Calibri, 'Segoe UI', Arial, sans-serif !important;font-size:14pt}
         .pr-header{text-align:center;padding:8px 0 10px;border-bottom:2px solid #1c1c1c;margin-bottom:12px}
         .pr-inst{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:16pt;font-weight:700;letter-spacing:.2px;margin-bottom:6px}
@@ -664,8 +664,8 @@ export default function LabRecordApp() {
         .exp-right-block{text-align:right;padding-left:24px;border-left:1px solid #bbb}
         .score-meta-label{font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#999;margin-bottom:4px}
         .score-num{font-family:'Source Serif 4',Georgia,serif;font-size:1.75rem;font-weight:700;line-height:1}
-        .pr-content{padding:0;background:#fff;flex:1;overflow:visible;font-size:14pt;line-height:1.5;position:relative;z-index:3}
-        .pr-qa{border:none;margin:0 0 14px 0;padding:0;font-size:14pt;page-break-inside:avoid;break-inside:avoid}
+        .pr-content{padding:0;background:#fff;flex:1;overflow:visible;font-size:12pt;line-height:1.5;position:relative;z-index:3}
+        .pr-qa{border:none;margin:0 0 14px 0;padding:0;font-size:12pt;page-break-inside:avoid;break-inside:avoid}
         .pr-qa-head{background:transparent;border-bottom:1px solid #bbb;padding:8px 0;display:flex;align-items:flex-end;justify-content:space-between;font-weight:600;break-after:avoid;page-break-after:avoid}
         .pr-qnum{font-family:'Source Serif 4',Georgia,serif;font-weight:700;font-size:1.1rem;color:#1c1c1c}
         .pr-qa-right{display:flex;align-items:center;gap:14px;font-size:.97rem}
@@ -673,13 +673,13 @@ export default function LabRecordApp() {
         .pr-mk{font-family:'IBM Plex Mono',monospace;font-size:.97rem;font-weight:600}
         .pr-qa-body{padding:10px 0 0 0;break-inside:auto;page-break-inside:auto;background:#ffffff;position:relative;z-index:3}
         .ps-label{font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#000;margin-bottom:8px;page-break-inside:avoid;break-inside:avoid}
-        .ps-text{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:14pt;line-height:1;color:#000;white-space:pre-wrap;background:#ffffff;margin:6px 0 0 0;padding:4px 4px;border:none;page-break-inside:avoid;break-inside:avoid;position:relative;z-index:3;font-weight:600}
+        .ps-text{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:12pt;line-height:1;color:#000;white-space:pre-wrap;background:#ffffff;margin:6px 0 0 0;padding:4px 4px;border:none;page-break-inside:avoid;break-inside:avoid;position:relative;z-index:3;font-weight:600}
         .pr-result{margin:18px 0;padding:0;page-break-inside:avoid;break-inside:avoid;background:#ffffff;position:relative;z-index:3}
         .section-hd{font-size:.71rem;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;color:#555;margin-bottom:10px}
-        .pr-result-text{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:14pt;line-height:1.4;color:#000;background:#ffffff;padding:2px 2px;position:relative;z-index:3;font-weight:600}
-        .pr-result-write{min-height:90px;border:1px solid #1c1c1c;padding:10px 12px;white-space:pre-wrap;break-inside:avoid;page-break-inside:avoid;background:#ffffff;position:relative;z-index:3}
+        .pr-result-text{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:12pt;line-height:1.4;color:#000;background:#ffffff;padding:2px 2px;position:relative;z-index:3;font-weight:600}
+        .pr-result-write{min-height:24px;border:1px solid #1c1c1c;padding:10px 12px;white-space:pre-wrap;break-inside:avoid;page-break-inside:avoid;background:#ffffff;position:relative;z-index:3}
         .pr-rubric{margin-bottom:0;page-break-inside:avoid;break-inside:avoid}
-        .pr-rubric, .pr-rubric *{font-size:16pt}
+        .pr-rubric, .pr-rubric *{font-size:12pt}
         .pr-rubric table{page-break-inside:avoid;break-inside:avoid}
 
         @media print{
@@ -973,19 +973,19 @@ export default function LabRecordApp() {
                         </div>
                       ))}
 
-                      <div style={{marginBottom:18}}>
-                        <div style={{textAlign:"right",marginBottom:12}}>
-                          <div style={{fontSize:".65rem",fontWeight:700,letterSpacing:"1.2px",textTransform:"uppercase",color:"#888",marginBottom:6}}>Total Score</div>
-                          <div style={{fontSize:"2rem",fontWeight:700,fontFamily:"'Source Serif 4'"}}>{totalObtained}/{totalMax}</div>
+                      <div style={{marginBottom:18,display:"flex",gap:20,alignItems:"flex-start"}}>
+                        <div style={{flex:"0 0 auto"}}>
+                          <div style={{fontSize:"8pt",fontWeight:700,letterSpacing:"1.2px",textTransform:"uppercase",color:"#888",marginBottom:6,fontFamily:"Calibri, sans-serif"}}>Total Score</div>
+                          <div style={{fontSize:"16pt",fontWeight:700,fontFamily:"Calibri, sans-serif"}}>{totalObtained}/{totalMax}</div>
                         </div>
-                      </div>
-                      <div className="pr-rubric" data-pdf-keep-together="true" style={{textAlign:"center",marginBottom:18,background:"#fff",position:"relative",zIndex:2,padding:"16px",boxShadow:"0 0 0 20px #fff",outline:"20px solid #fff"}}>
-                        <img src="/Rubrics.png" alt="Marks Rubric" style={{maxWidth:"100%",height:"auto",margin:"0 auto",display:"block",opacity:1,backgroundColor:"#fff",position:"relative",zIndex:3}} />
+                        <div className="pr-rubric" data-pdf-keep-together="true" style={{textAlign:"center",background:"#fff",position:"relative",zIndex:2,padding:"8px",boxShadow:"0 0 0 12px #fff",outline:"12px solid #fff",flex:1}}>
+                          <img src="/Rubrics.png" alt="Marks Rubric" style={{maxWidth:"100%",height:"auto",margin:"0 auto",display:"block",opacity:1,backgroundColor:"#fff",position:"relative",zIndex:3,maxHeight:"150px"}} />
+                        </div>
                       </div>
                       <div style={{marginBottom:18}}>
                         <div className="pr-result" data-pdf-keep-together="true" style={{border:"none",background:"transparent"}}>
                           <div className="section-hd">Result:</div>
-                          <div className="pr-result-write pr-result-text" style={{border:"none",background:"transparent",minHeight:"90px"}}>{result || "\n\n\n"}</div>
+                          <div className="pr-result-write pr-result-text" style={{border:"none",background:"transparent",minHeight:"24px"}}>{result || ""}</div>
                         </div>
                       </div>
                     </div>
