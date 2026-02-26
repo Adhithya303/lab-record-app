@@ -292,6 +292,21 @@ export default function LabRecordApp() {
   const [parseError, setParseError]   = useState("");
   const [downloading, setDownloading] = useState(false);
 
+  // Simulate heavy background processing with random delay (0.5-5s, ease-out to 5s)
+  const getRandomDelay = () => {
+    const random = Math.random();
+    // 80% chance for 0.5s, 20% chance for 0.5-5s with ease-out
+    if (random < 0.8) return 500;
+    const t = (random - 0.8) / 0.2; // 0 to 1
+    const easeOut = 1 - Math.pow(1 - t, 3); // cubic ease-out
+    return 500 + easeOut * 4500; // 500ms to 5s
+  };
+
+  const addProcessingDelay = async () => {
+    const delay = getRandomDelay();
+    return new Promise(resolve => setTimeout(resolve, delay));
+  };
+
   const [parsedStudent, setParsedStudent] = useState(null);
   const [labInfo, setLabInfo]   = useState({ institution:"", labName:"", recordName:"", weekNo:"", experimentTitle:"", date:"", totalMarks:"" });
   const [qaList, setQaList]     = useState([]);
@@ -319,6 +334,7 @@ export default function LabRecordApp() {
     if (!pdfFile) return;
     setParsing(true); setParseError("");
     try {
+      await addProcessingDelay();
       const text = await extractTextFromPDF(pdfFile);
       const { studentInfo: si, labInfo: li, questions } = parsePSGLabPDF(text);
       setParsedStudent(si);
@@ -598,6 +614,10 @@ export default function LabRecordApp() {
         .error-box{background:#fdecea;border:1.5px solid #f5c6c2;padding:12px 16px;font-size:.97rem;color:#c0392b;margin-top:14px}
         .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
         @keyframes spin{to{transform:rotate(360deg)}}
+        .dl-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999}
+        .dl-card{background:#fff;padding:40px 32px;border-radius:8px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+        .dl-spinner{display:inline-block;width:44px;height:44px;border:4px solid #e0e0e0;border-top-color:#1c1c1c;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:20px}
+        .dl-msg{font-size:1.2rem;font-weight:600;color:#1c1c1c;margin-bottom:8px;font-family:'Source Serif 4',Georgia,serif}
         .inp-group{display:flex;flex-direction:column;gap:5px}
         .inp-group label{font-size:.77rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888}
         .inp-group input,.inp-group textarea{border:1.5px solid #d4cec6;padding:9px 12px;font-size:1.025rem;font-family:'DM Sans',sans-serif;background:#faf8f5;color:#1c1c1c;outline:none;width:100%;transition:border-color .15s}
@@ -631,6 +651,16 @@ export default function LabRecordApp() {
         .rtable .total-r td{font-weight:700;font-family:Calibri, 'Segoe UI', Arial, sans-serif;background:#fff;border:1.5px solid #000;color:#000}
         .rtable input[type=number]{width:80px;border:1px solid #ccc;padding:6px 8px;font-size:.97rem;font-family:'DM Sans',sans-serif;background:#fff;text-align:center;outline:none}
         .rtable input[type=number]:focus{border-color:#1c1c1c;background:#fafafa}
+
+        /* ══ Responsive Form Grid ══ */
+        .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16}
+        @media(max-width:768px){.form-grid{grid-template-columns:1fr;gap:12}}
+        @media(max-width:480px){.form-grid{gap:10}}
+
+        /* ══ Responsive PDF Grid ══ */
+        .pdf-grid-2col{display:grid;grid-template-columns:1fr 1fr;gap:12;padding:8px 0;border-bottom:1px solid #bbb;margin-bottom:12}
+        @media(max-width:768px){.pdf-grid-2col{grid-template-columns:1fr;gap:8}}
+
         .pr-wrap{background:#fff;display:flex;flex-direction:column}
         .pr-pages-wrapper{display:flex;flex-direction:column;padding:0;background:#fff}
         .pr-page{background:#fff;width:210mm;min-height:297mm;height:auto;margin:0 auto;padding:6mm 18mm 18mm 18mm;box-sizing:border-box;position:relative;overflow:visible;border:none;box-shadow:0 0 0 2px #1c1c1c}
@@ -714,6 +744,137 @@ export default function LabRecordApp() {
         .watermark-bl{bottom:10px;left:10px}
         .watermark-br{bottom:10px;right:10px}
         @media print{.no-print{display:none!important}body{background:#fff!important}.wrap{padding:0!important;max-width:100%!important}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+        /* ══ MOBILE RESPONSIVE ══ */
+        @media(max-width:768px){
+          .wrap{padding:20px 16px 60px;max-width:100%}
+          .app-header{flex-direction:column;align-items:flex-start;gap:12px;padding-bottom:16px;margin-bottom:12px}
+          .app-header h1{font-size:1.5rem}
+          .app-header .sub{font-size:.7rem}
+          .badge-inst{font-size:.65rem;padding:4px 12px}
+          .steps{margin-bottom:20px;flex-wrap:wrap;border:none}
+          .step-item{border-right:none;border-bottom:1.5px solid #1c1c1c;padding:8px 0;font-size:.7rem;flex:1}
+          .step-item:last-child{border-bottom:none}
+          .step-num{width:18px;height:18px;font-size:.7rem}
+          .card{padding:18px 16px;margin-bottom:16px;border:1px solid #ddd7ce}
+          .card-title{font-size:1rem;margin-bottom:16px;gap:8px}
+          .upload-zone{padding:32px 16px}
+          .upload-icon{font-size:2.5rem;margin-bottom:8px}
+          .upload-title{font-size:1.05rem}
+          .upload-hint{font-size:.85rem}
+          .file-pill{padding:8px 12px;gap:8px}
+          .file-name{font-size:.9rem}
+          .file-size{font-size:.8rem}
+          .error-box{font-size:.9rem;padding:10px 12px}
+          .inp-group label{font-size:.7rem}
+          .inp-group input,.inp-group textarea{padding:8px 10px;font-size:.95rem}
+          .inp-group textarea{min-height:70px}
+          .validation-msg{font-size:.75rem}
+          .btn{padding:10px 16px;font-size:.75rem;letter-spacing:1px}
+          .btn-row{flex-direction:column;margin-top:18px;gap:10px}
+          .btn-row button{width:100%}
+          .btn-row>div{width:100%;display:flex;flex-direction:column;gap:10px}
+          .btn-row>div>button{width:100%}
+          .marks-display{font-size:.95rem;padding:4px 8px}
+          .qa-head{padding:10px 12px;gap:8px;flex-wrap:wrap}
+          .qa-num{font-size:1rem}
+          .qa-right{flex-wrap:wrap;width:100%;justify-content:space-between;gap:8px}
+          .qa-ps{padding:12px;font-size:.95rem;line-height:1.6}
+          .stag{font-size:.65rem;padding:2px 8px}
+          .pr-page{width:100%;min-height:auto;padding:8mm 12mm 12mm;box-shadow:0 0 0 1px #ccc;margin-bottom:16px}
+          .pr-page::before{width:60%;height:60%;opacity:0.1}
+          .pr-inst,.pr-lab-name,.pr-lab{font-size:11pt}
+          .pr-subtitle{font-size:11pt}
+          .info-strip{grid-template-columns:repeat(2,1fr);margin-bottom:8px}
+          .info-strip.row2{grid-template-columns:repeat(2,1fr)}
+          .info-cell{padding:6px 8px}
+          .ic-label{font-size:10pt}
+          .ic-value{font-size:11pt}
+          .pr-header{padding:6px 0 8px;margin-bottom:8px}
+          .exp-strip{padding:10px 16px;flex-direction:column;gap:8px}
+          .exp-right-block{text-align:left;padding-left:0;border-left:none}
+          .score-meta-label{font-size:10pt}
+          .qa-item{margin-bottom:12px}
+          .rtable{font-size:.9rem}
+          .rtable th{padding:8px 10px;font-size:.65rem}
+          .rtable td{padding:8px 10px}
+          .rtable input[type=number]{width:60px;font-size:.85rem}
+        }
+
+        @media(max-width:480px){
+          .wrap{padding:16px 12px 50px}
+          .app-header{flex-direction:column;align-items:stretch}
+          .app-header h1{font-size:1.3rem;letter-spacing:0}
+          .app-header img{height:56px;width:56px}
+          .app-header .sub{font-size:.65rem}
+          .badge-inst{font-size:.6rem;padding:3px 10px}
+          .steps{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:16px}
+          .step-item{border-right:none;border-bottom:1.5px solid #1c1c1c;border-right:1.5px solid #1c1c1c;padding:6px;font-size:.6rem;text-align:center}
+          .step-item:nth-child(1),.step-item:nth-child(3){border-right:1.5px solid #1c1c1c}
+          .step-item:nth-child(3),.step-item:nth-child(4){border-bottom:none}
+          .step-num{width:16px;height:16px;font-size:.6rem}
+          .card{padding:14px 12px;margin-bottom:12px}
+          .card-title{font-size:.95rem;margin-bottom:12px;flex-direction:column;gap:6px}
+          .card-title::after{display:none}
+          .upload-zone{padding:24px 12px}
+          .upload-icon{font-size:2rem;margin-bottom:6px}
+          .upload-title{font-size:.95rem}
+          .upload-hint{font-size:.8rem}
+          .file-pill{padding:6px 10px;font-size:.85rem}
+          .file-name{font-size:.8rem}
+          .file-size{font-size:.75rem}
+          .error-box{font-size:.8rem;padding:8px 10px}
+          .inp-group label{font-size:.65rem;letter-spacing:1px}
+          .inp-group input,.inp-group textarea{padding:6px 10px;font-size:.9rem}
+          .inp-group textarea{min-height:60px}
+          .validation-msg{font-size:.7rem}
+          .btn{padding:8px 12px;font-size:.7rem;letter-spacing:.5px}
+          .marks-display{font-size:.85rem;padding:3px 6px}
+          .qa-head{padding:8px 10px;gap:6px}
+          .qa-num{font-size:.95rem}
+          .qa-right{gap:6px}
+          .qa-ps{padding:10px;font-size:.9rem;line-height:1.5}
+          .stag{font-size:.6rem;padding:1px 6px;letter-spacing:.5px}
+          .pr-page{width:100%;padding:6mm 10mm;box-shadow:0 0 0 1px #ccc;margin-bottom:12px}
+          .pr-inst,.pr-lab-name,.pr-lab{font-size:10pt}
+          .info-strip{grid-template-columns:1fr;margin-bottom:6px;gap:0}
+          .info-strip.row2{grid-template-columns:1fr}
+          .info-cell{padding:4px 6px;border-right:none;border-bottom:1px solid #bbb}
+          .info-cell:last-child{border-bottom:none}
+          .ic-label{font-size:9pt;letter-spacing:.5px}
+          .ic-value{font-size:10pt}
+          .pr-header{padding:4px 0 6px;margin-bottom:6px;font-size:10pt}
+          .exp-strip{padding:8px 12px;gap:6px}
+          .score-meta-label{font-size:9pt}
+          .pr-subtitle{font-size:10pt;letter-spacing:1px}
+          .qa-item{margin-bottom:10px}
+          .rtable{font-size:.8rem}
+          .rtable th{padding:6px 8px;font-size:.6rem}
+          .rtable td{padding:6px 8px}
+          .rtable input[type=number]{width:50px;font-size:.8rem}
+          .test-case-check label{font-size:.95rem}
+          .test-case-item{font-size:.9rem}
+          .dl-sub{font-size:.85rem}
+
+          /* ══ Rubric responsive ══ */
+          div[style*="flex"][style*="gap:24"][style*="alignItems"]>div[style*="flex"][style*="50%"]{flex:0 0 100% !important;margin-left:0 !important;margin-bottom:12px}
+          div[style*="flex"][style*="gap:24"][style*="alignItems"]>div[style*="flex:1"]{flex:1 !important}
+        }
+
+        @media(max-width:360px){
+          .wrap{padding:12px 10px 40px}
+          .app-header{gap:8px}
+          .app-header h1{font-size:1.1rem}
+          .app-header img{height:48px;width:48px}
+          .steps{grid-template-columns:1fr 1fr;margin-bottom:12px}
+          .step-item{padding:4px;font-size:.55rem}
+          .step-num{width:14px;height:14px;font-size:.55rem}
+          .card{padding:12px 10px;margin-bottom:10px}
+          .card-title{font-size:.9rem;margin-bottom:10px}
+          .inp-group input,.inp-group textarea{font-size:.85rem;padding:5px 8px}
+          .btn{padding:7px 10px;font-size:.65rem}
+          .pr-page{padding:4mm 8mm;font-size:9pt}
+        }
       `}</style>
 
       {downloading && (
@@ -786,7 +947,7 @@ export default function LabRecordApp() {
           <div>
             <div className="card">
               <div className="card-title">Experiment Details</div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+              <div className="form-grid">
                 <div className={`inp-group${showValidation && !labInfo.weekNo.trim() ? ' invalid' : ''}`}>
                   <label>Week (e.g. Week 1)<span className="required-star">*</span></label>
                   <input type="text" value={labInfo.weekNo} onChange={e => updateLab("weekNo", e.target.value)} placeholder="Week 1" />
@@ -943,7 +1104,7 @@ export default function LabRecordApp() {
 
                       <div className="info-strip">
                         <div className="info-cell"><div className="ic-label">Student Name</div><div className="ic-value">{si.name || ""}</div></div>
-                        <div className="info-cell"><div className="ic-label">Register Number</div><div className="ic-value">{effectiveRollNo}</div></div>
+                        <div className="info-cell"><div className="ic-label">Register No</div><div className="ic-value">{effectiveRollNo}</div></div>
                         <div className="info-cell"><div className="ic-label">Department</div><div className="ic-value">{si.department || si.branch || ""}</div></div>
                         <div className="info-cell"><div className="ic-label">Date</div><div className="ic-value">{labInfo.date || today}</div></div>
                       </div>
@@ -991,7 +1152,7 @@ export default function LabRecordApp() {
                       ))}
 
                       <div style={{marginBottom:18, display:"flex", gap:24, alignItems:"flex-start"}}>
-                        <div className="pr-rubric" data-pdf-keep-together="true" style={{flex:"0 0 50%", marginLeft:16, background:"#fff",position:"relative",zIndex:2,padding:"16px",boxShadow:"0 0 0 20px #fff",outline:"20px solid #fff"}}>
+                        <div className="pr-rubric" data-pdf-keep-together="true" style={{flex:"0 0 50%", marginLeft:32, background:"#fff",position:"relative",zIndex:2,padding:"16px",boxShadow:"0 0 0 20px #fff",outline:"20px solid #fff"}}>
                           <img src="/Rubrics.png" alt="Marks Rubric" style={{maxWidth:"100%",height:"auto",display:"block",opacity:1,backgroundColor:"#fff",position:"relative",zIndex:3}} />
                         </div>
                         <div style={{textAlign:"right", flex:"1"}}>
@@ -1002,7 +1163,7 @@ export default function LabRecordApp() {
                       <div style={{marginBottom:18}}>
                         <div className="pr-result" data-pdf-keep-together="true" style={{border:"none",background:"transparent"}}>
                           <div className="section-hd">Result:</div>
-                          <div className="pr-result-write pr-result-text" style={{border:"none",background:"transparent",minHeight:"90px"}}>{result || "\n\n\n"}</div>
+                          <div className="pr-result-write pr-result-text" style={{border:"none",background:"transparent",minHeight:"20px",paddingBottom:"4px"}}>{result || ""}</div>
                         </div>
                       </div>
                     </div>
