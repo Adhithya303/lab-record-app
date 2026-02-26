@@ -574,7 +574,7 @@ export default function LabRecordApp() {
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         .bg-image-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:url('/image.png') center/cover no-repeat;opacity:0.5;z-index:0;pointer-events:none}
         .wrap{max-width:900px;margin:0 auto;padding:32px 24px 80px;position:relative;z-index:1}
-        .app-header{display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:20px;border-bottom:2.5px solid #1c1c1c;margin-bottom:30px}
+        .app-header{display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:20px;border-bottom:2.5px solid #1c1c1c;margin-bottom:16px}
         .app-header h1{font-family:'Source Serif 4',Georgia,serif;font-size:1.95rem;font-weight:700;letter-spacing:-.5px}
         .app-header .sub{font-size:.8rem;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:#999;margin-top:4px}
         .badge-inst{background:#1c1c1c;color:#f4f1ec;padding:6px 16px;font-size:.77rem;font-weight:700;letter-spacing:2px;text-transform:uppercase}
@@ -648,43 +648,43 @@ export default function LabRecordApp() {
         .pdf-generating .pdf-hide{visibility:hidden !important}
         .pdf-generating .pr-page{box-shadow:none !important}
         .pdf-generating .pr-page::before{display:none !important}
-        .pr-content-wrapper{position:relative;z-index:2;flex:1;overflow:visible;font-size:14pt;line-height:1.5;font-family:Calibri, 'Segoe UI', Arial, sans-serif;color:#000}
-        .pr-content-wrapper *{color:#000 !important;font-family:Calibri, 'Segoe UI', Arial, sans-serif !important;font-size:14pt}
+        .pr-content-wrapper{position:relative;z-index:2;flex:1;overflow:visible;font-size:12pt;line-height:1.5;font-family:Calibri, 'Segoe UI', Arial, sans-serif;color:#000}
+        .pr-content-wrapper *{color:#000 !important;font-family:Calibri, 'Segoe UI', Arial, sans-serif !important;font-size:12pt}
         .pr-header{text-align:center;padding:8px 0 10px;border-bottom:2px solid #1c1c1c;margin-bottom:12px}
-        .pr-inst{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:16pt;font-weight:700;letter-spacing:.2px;margin-bottom:6px}
-        .pr-lab-name{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:16pt;font-weight:700;letter-spacing:.2px;margin-bottom:6px}
-        .pr-subtitle{font-size:.7rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#666;margin:8px 0 4px}
-        .pr-lab{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:16pt;font-weight:700;font-style:normal;color:#333;margin-top:6px}
+        .pr-inst{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:12pt;font-weight:700;letter-spacing:.2px;margin-bottom:6px}
+        .pr-lab-name{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:12pt;font-weight:700;letter-spacing:.2px;margin-bottom:6px}
+        .pr-subtitle{font-size:12pt;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#666;margin:8px 0 4px}
+        .pr-lab{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:12pt;font-weight:700;font-style:normal;color:#333;margin-top:6px}
         .info-strip{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid #bbb;margin-bottom:10px}
         .info-strip.row2{grid-template-columns:1.8fr 1.2fr 1fr 1fr;border-bottom:1px solid #bbb;margin-bottom:10px}
         .info-cell{padding:8px 10px;border-right:1px solid #bbb}
         .info-cell:last-child{border-right:none}
-        .ic-label{font-size:.65rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#888;margin-bottom:2px}
-        .ic-value{font-size:.97rem;color:#1c1c1c;font-weight:700;font-family:'Source Serif 4',Georgia,serif;word-break:break-all}
+        .ic-label{font-size:12pt;font-weight:400;letter-spacing:1.2px;text-transform:uppercase;color:#888;margin-bottom:2px;font-family:Calibri, 'Segoe UI', Arial, sans-serif}
+        .ic-value{font-size:12pt;color:#1c1c1c;font-weight:700;font-family:Calibri, 'Segoe UI', Arial, sans-serif;word-break:break-all}
         .exp-strip{border-bottom:1px solid #bbb;padding:14px 24px;display:flex;justify-content:space-between;align-items:flex-start}
-        .exp-meta-label{font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#999;margin-bottom:3px}
-        .exp-meta-val{font-family:'Source Serif 4',Georgia,serif;font-size:1.1rem;font-weight:700}
-        .exp-prog-label{font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#999;margin-top:10px;margin-bottom:3px}
-        .exp-prog-val{font-family:'Source Serif 4',Georgia,serif;font-size:1.05rem;font-style:italic;color:#333}
+        .exp-meta-label{font-size:12pt;font-weight:400;letter-spacing:1.5px;text-transform:uppercase;color:#999;margin-bottom:3px;font-family:Calibri, 'Segoe UI', Arial, sans-serif}
+        .exp-meta-val{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:12pt;font-weight:700}
+        .exp-prog-label{font-size:12pt;font-weight:400;letter-spacing:1.5px;text-transform:uppercase;color:#999;margin-top:10px;margin-bottom:3px;font-family:Calibri, 'Segoe UI', Arial, sans-serif}
+        .exp-prog-val{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:12pt;font-style:italic;color:#333}
         .exp-right-block{text-align:right;padding-left:24px;border-left:1px solid #bbb}
-        .score-meta-label{font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#999;margin-bottom:4px}
-        .score-num{font-family:'Source Serif 4',Georgia,serif;font-size:1.75rem;font-weight:700;line-height:1}
-        .pr-content{padding:0;background:#fff;flex:1;overflow:visible;font-size:14pt;line-height:1.5}
-        .pr-qa{border:none;margin:0 0 14px 0;padding:0;font-size:14pt;page-break-inside:avoid;break-inside:avoid}
+        .score-meta-label{font-size:12pt;font-weight:400;letter-spacing:1.5px;text-transform:uppercase;color:#999;margin-bottom:4px;font-family:Calibri, 'Segoe UI', Arial, sans-serif}
+        .score-num{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:12pt;font-weight:700;line-height:1}
+        .pr-content{padding:0;background:#fff;flex:1;overflow:visible;font-size:12pt;line-height:1.5}
+        .pr-qa{border:none;margin:0 0 14px 0;padding:0;font-size:12pt;page-break-inside:avoid;break-inside:avoid}
         .pr-qa-head{background:transparent;border-bottom:1px solid #bbb;padding:8px 0;display:flex;align-items:flex-end;justify-content:space-between;font-weight:600;break-after:avoid;page-break-after:avoid}
-        .pr-qnum{font-family:'Source Serif 4',Georgia,serif;font-weight:700;font-size:1.1rem;color:#1c1c1c}
-        .pr-qa-right{display:flex;align-items:center;gap:14px;font-size:.97rem}
-        .pr-stag{font-size:.75rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border:1px solid #888;color:#333;background:transparent}
-        .pr-mk{font-family:'IBM Plex Mono',monospace;font-size:.97rem;font-weight:600}
+        .pr-qnum{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-weight:700;font-size:12pt;color:#1c1c1c}
+        .pr-qa-right{display:flex;align-items:center;gap:14px;font-size:12pt}
+        .pr-stag{font-size:12pt;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border:1px solid #888;color:#333;background:transparent}
+        .pr-mk{font-family:'IBM Plex Mono',monospace;font-size:12pt;font-weight:600}
         .pr-qa-body{padding:10px 0 0 0;break-inside:auto;page-break-inside:auto}
-        .ps-label{font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#000;margin-bottom:8px;page-break-inside:avoid;break-inside:avoid}
-        .ps-text{font-family:'IBM Plex Mono',monospace;font-size:14pt;line-height:1;color:#000;white-space:pre-wrap;background:transparent;margin:6px 0 0 0;padding:0;border:none;page-break-inside:avoid;break-inside:avoid}
+        .ps-label{font-size:12pt;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#000;margin-bottom:8px;page-break-inside:avoid;break-inside:avoid}
+        .ps-text{font-family:'IBM Plex Mono',monospace;font-size:12pt;line-height:1;color:#000;white-space:pre-wrap;background:transparent;margin:6px 0 0 0;padding:0;border:none;page-break-inside:avoid;break-inside:avoid}
         .pr-result{margin:18px 0;padding:0;page-break-inside:avoid;break-inside:avoid}
-        .section-hd{font-size:.71rem;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;color:#555;margin-bottom:10px}
-        .pr-result-text{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:14pt;line-height:1.4;color:#000}
+        .section-hd{font-size:12pt;font-weight:400;letter-spacing:2.2px;text-transform:uppercase;color:#555;margin-bottom:10px;font-family:Calibri, 'Segoe UI', Arial, sans-serif}
+        .pr-result-text{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:12pt;line-height:1.4;color:#000}
         .pr-result-write{min-height:90px;border:1px solid #1c1c1c;padding:10px 12px;white-space:pre-wrap;break-inside:avoid;page-break-inside:avoid}
         .pr-rubric{margin-bottom:0;page-break-inside:avoid;break-inside:avoid}
-        .pr-rubric, .pr-rubric *{font-size:16pt}
+        .pr-rubric, .pr-rubric *{font-size:12pt}
         .pr-rubric table{page-break-inside:avoid;break-inside:avoid}
 
         @media print{
@@ -817,44 +817,27 @@ export default function LabRecordApp() {
                   {showValidation && !labInfo.recordName.trim() && <div className="validation-msg">Lab Record Name is required</div>}
                 </div>
               </div>
+              <div style={{display:"flex",justifyContent:"flex-end",marginTop:16,gap:8}}>
+                <button 
+                  className="btn" 
+                  disabled={!labInfo.weekNo.trim() || !labInfo.experimentTitle.trim() || !effectiveRollNo.trim() || !labInfo.recordName.trim() || !rollNoIsValid || qaList.length === 0 || downloading}
+                  onClick={handleDownloadPDF}
+                  title="Download PDF"
+                  style={{padding:"8px 12px",fontSize:"1.3rem",display:"flex",alignItems:"center",justifyContent:"center"}}
+                >
+                  <i className="bi bi-download"></i>
+                </button>
+              </div>
             </div>
 
             <div className="card">
-              <div className="card-title" style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <div className="card-title">
                 <span>Section A — Questions &amp; Marks</span>
-                <div style={{display:"flex",gap:8}}>
-                  <button 
-                    className="btn" 
-                    onClick={() => setSelectedQuestions(new Set(qaList.map(q => q.id)))}
-                    style={{padding:"6px 12px",fontSize:".85rem"}}
-                  >
-                    Select All
-                  </button>
-                </div>
               </div>
-              <p style={{ fontSize:".91rem", color:"#888", fontStyle:"italic", marginBottom:16 }}>Marks are extracted directly from the student's PDF and are not editable. Select questions to include in the PDF.</p>
               {qaList.length === 0 && <p style={{ fontSize:"1rem", color:"#999" }}>No questions detected.</p>}
               {qaList.map((qa, idx) => (
-                <div className="qa-item" key={qa.id} style={{opacity: selectedQuestions.has(qa.id) ? 1 : 0.5}}>
+                <div className="qa-item" key={qa.id}>
                   <div className="qa-head">
-                    <label style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer",marginRight:12}}>
-                      <input 
-                        type="checkbox" 
-                        checked={selectedQuestions.has(qa.id)} 
-                        onChange={(e) => {
-                          const newSelected = new Set(selectedQuestions);
-                          if (e.target.checked) {
-                            newSelected.add(qa.id);
-                          } else {
-                            // Don't allow deselecting if only one question is selected
-                            if (selectedQuestions.size === 1) return;
-                            newSelected.delete(qa.id);
-                          }
-                          setSelectedQuestions(newSelected);
-                        }}
-                        style={{cursor:"pointer",width:18,height:18,margin:0}} 
-                      />
-                    </label>
                     <span className="qa-num">Question {idx + 1}</span>
                     <div className="qa-right">
                       {qa.status && <span className="stag">{qa.status}</span>}
@@ -864,12 +847,9 @@ export default function LabRecordApp() {
                   <div className="qa-ps">{qa.problemStatement || <em style={{ color:"#aaa" }}>No problem statement extracted.</em>}</div>
                 </div>
               ))}
-              <div style={{ display:"flex", justifyContent:"space-between", paddingTop:10, gap:8, alignItems:"center" }}>
-                <span style={{ fontSize:".85rem", color:selectedQuestions.size === 0 ? "#c0392b" : "#666" }}>Selected: {selectedQuestions.size} of {qaList.length} questions {selectedQuestions.size === 0 && <span style={{fontWeight:700}}>— Select at least one question</span>}</span>
-                <div style={{ display:"flex", gap:8, alignItems:"center" }}>
-                  <span style={{ fontSize:".93rem", color:"#888" }}>Total marks:</span>
-                  <strong style={{ fontFamily:"'IBM Plex Mono',monospace", fontSize:"1.15rem" }}>{totalObtained} / {totalMax}</strong>
-                </div>
+              <div style={{ display:"flex", justifyContent:"flex-end", paddingTop:10, gap:8, alignItems:"center" }}>
+                <span style={{ fontSize:".93rem", color:"#888" }}>Total marks:</span>
+                <strong style={{ fontFamily:"'IBM Plex Mono',monospace", fontSize:"1.15rem" }}>{totalObtained} / {totalMax}</strong>
               </div>
             </div>
 
@@ -974,22 +954,22 @@ export default function LabRecordApp() {
                       </div>
                       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,padding:"8px 0",borderBottom:"1px solid #bbb",marginBottom:12}}>
                         <div>
-                          <div style={{fontSize:".65rem",fontWeight:700,letterSpacing:"1.2px",textTransform:"uppercase",color:"#888",marginBottom:2}}>Week</div>
-                          <div style={{fontSize:"1.05rem",fontWeight:600,fontFamily:"'Source Serif 4'",color:"#1c1c1c"}}>{labInfo.weekNo || "Week 1"}</div>
+                          <div style={{fontSize:"12pt",fontWeight:400,letterSpacing:"1.2px",textTransform:"uppercase",color:"#888",marginBottom:2}}>Week</div>
+                          <div style={{fontSize:"12pt",fontWeight:700,fontFamily:"Calibri, 'Segoe UI', Arial, sans-serif",color:"#1c1c1c"}}>{labInfo.weekNo || "Week 1"}</div>
                         </div>
                         <div style={{textAlign:"right"}}>
                           {labInfo.experimentTitle && (
                             <>
-                              <div style={{fontSize:".65rem",fontWeight:700,letterSpacing:"1.2px",textTransform:"uppercase",color:"#888",marginBottom:2}}>Program</div>
-                              <div style={{fontSize:"1rem",fontStyle:"normal",color:"#333"}}>{labInfo.experimentTitle}</div>
+                              <div style={{fontSize:"12pt",fontWeight:400,letterSpacing:"1.2px",textTransform:"uppercase",color:"#888",marginBottom:2}}>Program</div>
+                              <div style={{fontSize:"12pt",fontWeight:700,fontStyle:"normal",color:"#333"}}>{labInfo.experimentTitle}</div>
                             </>
                           )}
                         </div>
                       </div>
 
                       <div style={{marginBottom:12}}>
-                        <div style={{fontSize:".9rem",fontWeight:700,letterSpacing:"1.2px",textTransform:"uppercase",color:"#888",marginBottom:6}}>Aim:</div>
-                        <div style={{minHeight:"80px",whiteSpace:"pre-wrap",lineHeight:1.6,fontSize:"14pt"}}>{aim || "\n\n\n"}</div>
+                        <div style={{fontSize:"12pt",fontWeight:400,letterSpacing:"1.2px",textTransform:"uppercase",color:"#888",marginBottom:6,fontFamily:"Calibri, 'Segoe UI', Arial, sans-serif"}}>Aim:</div>
+                        <div style={{minHeight:"80px",whiteSpace:"pre-wrap",lineHeight:1.6,fontSize:"12pt",fontFamily:"Calibri, 'Segoe UI', Arial, sans-serif"}}>{aim || "\n\n\n"}</div>
                       </div>
 
                       {qaList.filter(qa => selectedQuestions.has(qa.id)).map((qa, idx) => (
@@ -1010,14 +990,14 @@ export default function LabRecordApp() {
                         </div>
                       ))}
 
-                      <div style={{marginBottom:18}}>
-                        <div style={{textAlign:"right",marginBottom:12}}>
-                          <div style={{fontSize:".65rem",fontWeight:700,letterSpacing:"1.2px",textTransform:"uppercase",color:"#888",marginBottom:6}}>Total Score</div>
-                          <div style={{fontSize:"2rem",fontWeight:700,fontFamily:"'Source Serif 4'"}}>{totalObtained}/{totalMax}</div>
+                      <div style={{marginBottom:18, display:"flex", gap:24, alignItems:"flex-start"}}>
+                        <div className="pr-rubric" data-pdf-keep-together="true" style={{flex:"0 0 50%", marginLeft:16, background:"#fff",position:"relative",zIndex:2,padding:"16px",boxShadow:"0 0 0 20px #fff",outline:"20px solid #fff"}}>
+                          <img src="/Rubrics.png" alt="Marks Rubric" style={{maxWidth:"100%",height:"auto",display:"block",opacity:1,backgroundColor:"#fff",position:"relative",zIndex:3}} />
                         </div>
-                      </div>
-                      <div className="pr-rubric" data-pdf-keep-together="true" style={{textAlign:"center",marginBottom:18,background:"#fff",position:"relative",zIndex:2,padding:"16px",boxShadow:"0 0 0 20px #fff",outline:"20px solid #fff"}}>
-                        <img src="/Rubrics.png" alt="Marks Rubric" style={{maxWidth:"100%",height:"auto",margin:"0 auto",display:"block",opacity:1,backgroundColor:"#fff",position:"relative",zIndex:3}} />
+                        <div style={{textAlign:"right", flex:"1"}}>
+                          <div style={{fontSize:"12pt",fontWeight:700,letterSpacing:"1.2px",textTransform:"uppercase",color:"#888",marginBottom:6}}>Total Score</div>
+                          <div style={{fontSize:"15pt",fontWeight:700,fontFamily:"Calibri, 'Segoe UI', Arial, sans-serif"}}>{totalObtained}/{totalMax}</div>
+                        </div>
                       </div>
                       <div style={{marginBottom:18}}>
                         <div className="pr-result" data-pdf-keep-together="true" style={{border:"none",background:"transparent"}}>
