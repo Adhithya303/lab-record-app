@@ -527,13 +527,31 @@ export default function LabRecordApp() {
         }
       };
 
+      // Helper: check if a canvas region is essentially blank (all white/near-white)
+      const isBlankRegion = (ctx, y, h, w) => {
+        const sampleH = Math.min(Math.ceil(h), ctx.canvas.height - Math.floor(y));
+        if (sampleH <= 0) return true;
+        const data = ctx.getImageData(0, Math.floor(y), w, sampleH).data;
+        let darkPixels = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          const lum = 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+          if (lum < 240) darkPixels++;
+        }
+        // If less than 0.1% of pixels are dark, consider it blank
+        const totalPixels = (w * sampleH);
+        return (darkPixels / totalPixels) < 0.001;
+      };
+
       let srcY = 0;
       const usableHPx = (usableH / ratio) * scaleFactor;
       while (srcY < canvas.height - 1) {
         const remainingPx = canvas.height - srcY;
 
         // Skip if only a tiny sliver remains (avoids blank trailing page)
-        if (remainingPx < 20) break;
+        if (remainingPx < 50) break;
+
+        // Skip if remaining region is blank whitespace
+        if (isBlankRegion(mainCtx, srcY, remainingPx, canvas.width)) break;
 
         const desiredPx = Math.min(usableHPx, remainingPx);
         const preferredBreak = srcY + desiredPx;
@@ -582,8 +600,11 @@ export default function LabRecordApp() {
         drawPageOverlays();
 
         srcY = breakY;
-        // Only add a new page if meaningful content remains
-        if (srcY < canvas.height - 20) doc.addPage();
+        // Only add a new page if meaningful (non-blank) content remains
+        const nextRemaining = canvas.height - srcY;
+        if (nextRemaining > 50 && !isBlankRegion(mainCtx, srcY, nextRemaining, canvas.width)) {
+          doc.addPage();
+        }
       }
       const name = si.name ? si.name.replace(/\s+/g, "_") : "student";
       const week = labInfo.weekNo ? labInfo.weekNo.replace(/\s+/g, "_") : "lab";
