@@ -292,14 +292,14 @@ export default function LabRecordApp() {
   const [parseError, setParseError]   = useState("");
   const [downloading, setDownloading] = useState(false);
 
-  // Simulate heavy background processing with random delay (0.5-5s, ease-out to 5s)
+  // Simulate heavy background processing with random delay (0.5-3s, ease-out to 3s)
   const getRandomDelay = () => {
     const random = Math.random();
-    // 80% chance for 0.5s, 20% chance for 0.5-5s with ease-out
+    // 80% chance for 0.5s, 20% chance for 0.5-3s with ease-out
     if (random < 0.8) return 500;
     const t = (random - 0.8) / 0.2; // 0 to 1
     const easeOut = 1 - Math.pow(1 - t, 3); // cubic ease-out
-    return 500 + easeOut * 4500; // 500ms to 5s
+    return 500 + easeOut * 2500; // 500ms to 3s
   };
 
   const addProcessingDelay = async () => {
@@ -531,6 +531,10 @@ export default function LabRecordApp() {
       const usableHPx = (usableH / ratio) * scaleFactor;
       while (srcY < canvas.height - 1) {
         const remainingPx = canvas.height - srcY;
+
+        // Skip if only a tiny sliver remains (avoids blank trailing page)
+        if (remainingPx < 20) break;
+
         const desiredPx = Math.min(usableHPx, remainingPx);
         const preferredBreak = srcY + desiredPx;
         const searchMin = srcY + Math.max(80, desiredPx - 180);
@@ -578,7 +582,8 @@ export default function LabRecordApp() {
         drawPageOverlays();
 
         srcY = breakY;
-        if (srcY < canvas.height - 1) doc.addPage();
+        // Only add a new page if meaningful content remains
+        if (srcY < canvas.height - 20) doc.addPage();
       }
       const name = si.name ? si.name.replace(/\s+/g, "_") : "student";
       const week = labInfo.weekNo ? labInfo.weekNo.replace(/\s+/g, "_") : "lab";
@@ -1161,7 +1166,7 @@ export default function LabRecordApp() {
                       ))}
 
                       <div data-pdf-keep-together="true" style={{marginBottom:18, display:"flex", gap:24, alignItems:"flex-start", pageBreakInside:"avoid", breakInside:"avoid"}}>
-                        <div className="pr-rubric" data-pdf-keep-together="true" style={{flex:"0 0 50%", marginLeft:32, background:"#fff",position:"relative",zIndex:2,padding:"16px",boxShadow:"0 0 0 20px #fff",outline:"20px solid #fff", pageBreakInside:"avoid", breakInside:"avoid"}}>
+                        <div className="pr-rubric" data-pdf-keep-together="true" style={{flex:"0 0 58%", marginLeft:32, background:"#fff",position:"relative",zIndex:2,padding:"16px",boxShadow:"0 0 0 20px #fff",outline:"20px solid #fff", pageBreakInside:"avoid", breakInside:"avoid"}}>
                           <img src="/Rubrics.png" alt="Marks Rubric" style={{maxWidth:"100%",height:"auto",display:"block",opacity:1,backgroundColor:"#fff",position:"relative",zIndex:3}} />
                         </div>
                         <div style={{textAlign:"right", flex:"1", pageBreakInside:"avoid", breakInside:"avoid"}}>
