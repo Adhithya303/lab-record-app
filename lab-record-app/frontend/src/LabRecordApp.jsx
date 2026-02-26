@@ -295,7 +295,6 @@ export default function LabRecordApp() {
   const [parsedStudent, setParsedStudent] = useState(null);
   const [labInfo, setLabInfo]   = useState({ institution:"", labName:"", recordName:"", weekNo:"", experimentTitle:"", date:"", totalMarks:"" });
   const [qaList, setQaList]     = useState([]);
-  const [selectedQuestions, setSelectedQuestions] = useState(new Set());
   const [rubric, setRubric]     = useState(rubricDefaults.map(r => ({ ...r })));
   const [includeTestCases, setIncludeTestCases] = useState(false);
   const [aim, setAim]           = useState("");
@@ -326,8 +325,6 @@ export default function LabRecordApp() {
       setManualRollNo(si.rollNo || "");
       const questionsWithId = questions.map((q, i) => ({ ...q, id: i }));
       setQaList(questionsWithId);
-      // Select all questions by default
-      setSelectedQuestions(new Set(questionsWithId.map(q => q.id)));
       // Auto-enable test cases if any question has test case content
       const hasTestCases = questions.some(q => q.testCase && q.testCase.trim());
       setIncludeTestCases(hasTestCases);
@@ -359,7 +356,6 @@ export default function LabRecordApp() {
     setRubric(rubricDefaults.map(r => ({ ...r })));
     setLabInfo({ institution:"", labName:"", recordName:"", weekNo:"", experimentTitle:"", date:"", totalMarks:"" });
     setIncludeTestCases(false);
-    setSelectedQuestions(new Set());
     setShowValidation(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -648,7 +644,7 @@ export default function LabRecordApp() {
         .pdf-generating .pdf-hide{visibility:hidden !important}
         .pdf-generating .pr-page{box-shadow:none !important}
         .pdf-generating .pr-page::before{display:none !important}
-        .pr-content-wrapper{position:relative;z-index:2;flex:1;overflow:visible;font-size:14pt;line-height:1.5;font-family:Calibri, 'Segoe UI', Arial, sans-serif;color:#000}
+        .pr-content-wrapper{position:relative;z-index:3;flex:1;overflow:visible;font-size:14pt;line-height:1.5;font-family:Calibri, 'Segoe UI', Arial, sans-serif;color:#000;background:#ffffff}
         .pr-content-wrapper *{color:#000 !important;font-family:Calibri, 'Segoe UI', Arial, sans-serif !important;font-size:14pt}
         .pr-header{text-align:center;padding:8px 0 10px;border-bottom:2px solid #1c1c1c;margin-bottom:12px}
         .pr-inst{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:16pt;font-weight:700;letter-spacing:.2px;margin-bottom:6px}
@@ -668,20 +664,20 @@ export default function LabRecordApp() {
         .exp-right-block{text-align:right;padding-left:24px;border-left:1px solid #bbb}
         .score-meta-label{font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#999;margin-bottom:4px}
         .score-num{font-family:'Source Serif 4',Georgia,serif;font-size:1.75rem;font-weight:700;line-height:1}
-        .pr-content{padding:0;background:#fff;flex:1;overflow:visible;font-size:14pt;line-height:1.5}
+        .pr-content{padding:0;background:#fff;flex:1;overflow:visible;font-size:14pt;line-height:1.5;position:relative;z-index:3}
         .pr-qa{border:none;margin:0 0 14px 0;padding:0;font-size:14pt;page-break-inside:avoid;break-inside:avoid}
         .pr-qa-head{background:transparent;border-bottom:1px solid #bbb;padding:8px 0;display:flex;align-items:flex-end;justify-content:space-between;font-weight:600;break-after:avoid;page-break-after:avoid}
         .pr-qnum{font-family:'Source Serif 4',Georgia,serif;font-weight:700;font-size:1.1rem;color:#1c1c1c}
         .pr-qa-right{display:flex;align-items:center;gap:14px;font-size:.97rem}
         .pr-stag{font-size:.75rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border:1px solid #888;color:#333;background:transparent}
         .pr-mk{font-family:'IBM Plex Mono',monospace;font-size:.97rem;font-weight:600}
-        .pr-qa-body{padding:10px 0 0 0;break-inside:auto;page-break-inside:auto}
+        .pr-qa-body{padding:10px 0 0 0;break-inside:auto;page-break-inside:auto;background:#ffffff;position:relative;z-index:3}
         .ps-label{font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#000;margin-bottom:8px;page-break-inside:avoid;break-inside:avoid}
-        .ps-text{font-family:'IBM Plex Mono',monospace;font-size:14pt;line-height:1.6;color:#000;white-space:pre-wrap;background:transparent;margin:6px 0 0 0;padding:0;border:none;page-break-inside:avoid;break-inside:avoid}
-        .pr-result{margin:18px 0;padding:0;page-break-inside:avoid;break-inside:avoid}
+        .ps-text{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:14pt;line-height:1;color:#000;white-space:pre-wrap;background:#ffffff;margin:6px 0 0 0;padding:4px 4px;border:none;page-break-inside:avoid;break-inside:avoid;position:relative;z-index:3;font-weight:600}
+        .pr-result{margin:18px 0;padding:0;page-break-inside:avoid;break-inside:avoid;background:#ffffff;position:relative;z-index:3}
         .section-hd{font-size:.71rem;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;color:#555;margin-bottom:10px}
-        .pr-result-text{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:14pt;line-height:1.4;color:#000}
-        .pr-result-write{min-height:90px;border:1px solid #1c1c1c;padding:10px 12px;white-space:pre-wrap;break-inside:avoid;page-break-inside:avoid}
+        .pr-result-text{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:14pt;line-height:1.4;color:#000;background:#ffffff;padding:2px 2px;position:relative;z-index:3;font-weight:600}
+        .pr-result-write{min-height:90px;border:1px solid #1c1c1c;padding:10px 12px;white-space:pre-wrap;break-inside:avoid;page-break-inside:avoid;background:#ffffff;position:relative;z-index:3}
         .pr-rubric{margin-bottom:0;page-break-inside:avoid;break-inside:avoid}
         .pr-rubric, .pr-rubric *{font-size:16pt}
         .pr-rubric table{page-break-inside:avoid;break-inside:avoid}
@@ -819,41 +815,12 @@ export default function LabRecordApp() {
             </div>
 
             <div className="card">
-              <div className="card-title" style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                <span>Section A — Questions &amp; Marks</span>
-                <div style={{display:"flex",gap:8}}>
-                  <button 
-                    className="btn" 
-                    onClick={() => setSelectedQuestions(new Set(qaList.map(q => q.id)))}
-                    style={{padding:"6px 12px",fontSize:".85rem"}}
-                  >
-                    Select All
-                  </button>
-                </div>
-              </div>
-              <p style={{ fontSize:".91rem", color:"#888", fontStyle:"italic", marginBottom:16 }}>Marks are extracted directly from the student's PDF and are not editable. Select questions to include in the PDF.</p>
+              <div className="card-title">Section A — Questions &amp; Marks</div>
+              <p style={{ fontSize:".91rem", color:"#888", fontStyle:"italic", marginBottom:16 }}>Marks are extracted directly from the student's PDF and are not editable.</p>
               {qaList.length === 0 && <p style={{ fontSize:"1rem", color:"#999" }}>No questions detected.</p>}
               {qaList.map((qa, idx) => (
-                <div className="qa-item" key={qa.id} style={{opacity: selectedQuestions.has(qa.id) ? 1 : 0.5}}>
+                <div className="qa-item" key={qa.id}>
                   <div className="qa-head">
-                    <label style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer",marginRight:12}}>
-                      <input 
-                        type="checkbox" 
-                        checked={selectedQuestions.has(qa.id)} 
-                        onChange={(e) => {
-                          const newSelected = new Set(selectedQuestions);
-                          if (e.target.checked) {
-                            newSelected.add(qa.id);
-                          } else {
-                            // Don't allow deselecting if only one question is selected
-                            if (selectedQuestions.size === 1) return;
-                            newSelected.delete(qa.id);
-                          }
-                          setSelectedQuestions(newSelected);
-                        }}
-                        style={{cursor:"pointer",width:18,height:18,margin:0}} 
-                      />
-                    </label>
                     <span className="qa-num">Question {idx + 1}</span>
                     <div className="qa-right">
                       {qa.status && <span className="stag">{qa.status}</span>}
@@ -863,12 +830,9 @@ export default function LabRecordApp() {
                   <div className="qa-ps">{qa.problemStatement || <em style={{ color:"#aaa" }}>No problem statement extracted.</em>}</div>
                 </div>
               ))}
-              <div style={{ display:"flex", justifyContent:"space-between", paddingTop:10, gap:8, alignItems:"center" }}>
-                <span style={{ fontSize:".85rem", color:selectedQuestions.size === 0 ? "#c0392b" : "#666" }}>Selected: {selectedQuestions.size} of {qaList.length} questions {selectedQuestions.size === 0 && <span style={{fontWeight:700}}>— Select at least one question</span>}</span>
-                <div style={{ display:"flex", gap:8, alignItems:"center" }}>
-                  <span style={{ fontSize:".93rem", color:"#888" }}>Total marks:</span>
-                  <strong style={{ fontFamily:"'IBM Plex Mono',monospace", fontSize:"1.15rem" }}>{totalObtained} / {totalMax}</strong>
-                </div>
+              <div style={{ display:"flex", justifyContent:"flex-end", paddingTop:10, gap:8, alignItems:"center" }}>
+                <span style={{ fontSize:".93rem", color:"#888" }}>Total marks:</span>
+                <strong style={{ fontFamily:"'IBM Plex Mono',monospace", fontSize:"1.15rem" }}>{totalObtained} / {totalMax}</strong>
               </div>
             </div>
 
@@ -991,7 +955,7 @@ export default function LabRecordApp() {
                         <div style={{minHeight:"80px",whiteSpace:"pre-wrap",lineHeight:1.6,fontSize:"14pt"}}>{aim || "\n\n\n"}</div>
                       </div>
 
-                      {qaList.filter(qa => selectedQuestions.has(qa.id)).map((qa, idx) => (
+                      {qaList.map((qa, idx) => (
                         <div key={qa.id} className="pr-qa">
                           <div className="pr-qa-head">
                             <span className="pr-qnum">Question {idx + 1}</span>
