@@ -542,13 +542,22 @@ export default function LabRecordApp() {
         breakY = Math.max(srcY + 120, Math.min(breakY, canvas.height));
 
         // ── Protect keep-together elements: if breakY falls inside one, move break before it ──
-        for (const zone of protectedZones) {
-          if (breakY > zone.top && breakY < zone.bottom) {
-            // Only move break before the zone if the zone fits on a single page
-            if ((zone.bottom - zone.top) <= usableHPx) {
-              breakY = Math.max(srcY + 80, zone.top - 10);
+        // Sort zones by top position so we always process top-most first
+        const sortedZones = [...protectedZones].sort((a, b) => a.top - b.top);
+        let moved = true;
+        let iterations = 0;
+        while (moved && iterations < 10) {
+          moved = false;
+          iterations++;
+          for (const zone of sortedZones) {
+            if (breakY > zone.top + 2 && breakY < zone.bottom - 2) {
+              // Only move break before the zone if the zone fits on a single page
+              if ((zone.bottom - zone.top) <= usableHPx) {
+                breakY = Math.max(srcY + 80, zone.top - 4);
+                moved = true;
+              }
+              break;
             }
-            break;
           }
         }
 
@@ -584,7 +593,7 @@ export default function LabRecordApp() {
   const today = new Date().toLocaleDateString("en-IN", { day:"2-digit", month:"long", year:"numeric" });
 
   return (
-    <div style={{ fontFamily:"Calibri, 'Segoe UI', Arial, sans-serif", minHeight:"100vh", background:"#f4f1ec", color:"#1c1c1c", position:"relative" }}>
+    <div style={{ fontFamily:"Calibri, 'Segoe UI', Arial, sans-serif", minHeight:"100vh", background:"#f4f1ec", color:"#1c1c1c", position:"relative", display:"flex", flexDirection:"column" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -1151,7 +1160,7 @@ export default function LabRecordApp() {
                         </div>
                       ))}
 
-                      <div style={{marginBottom:18, display:"flex", gap:24, alignItems:"flex-start", pageBreakInside:"avoid", breakInside:"avoid"}}>
+                      <div data-pdf-keep-together="true" style={{marginBottom:18, display:"flex", gap:24, alignItems:"flex-start", pageBreakInside:"avoid", breakInside:"avoid"}}>
                         <div className="pr-rubric" data-pdf-keep-together="true" style={{flex:"0 0 50%", marginLeft:32, background:"#fff",position:"relative",zIndex:2,padding:"16px",boxShadow:"0 0 0 20px #fff",outline:"20px solid #fff", pageBreakInside:"avoid", breakInside:"avoid"}}>
                           <img src="/Rubrics.png" alt="Marks Rubric" style={{maxWidth:"100%",height:"auto",display:"block",opacity:1,backgroundColor:"#fff",position:"relative",zIndex:3}} />
                         </div>
@@ -1176,8 +1185,8 @@ export default function LabRecordApp() {
       </div>
 
       {/* ══ FOOTER ══ */}
-      <footer className="no-print" style={{background:"#2d3748",color:"#a0aec0",padding:"18px 24px",textAlign:"center",fontSize:".93rem",lineHeight:1.7,marginTop:40,position:"relative",zIndex:10}}>
-        <div>© 2026 PSG Institute of Technology and Applied Research. All rights reserved.</div>
+      <footer className="no-print" style={{background:"#2d3748",color:"#a0aec0",padding:"18px 24px",textAlign:"center",fontSize:".93rem",lineHeight:1.7,marginTop:"auto",position:"sticky",bottom:0,zIndex:10}}>
+        <div>© 2026 PSG iTech. All rights reserved.</div>
         <div style={{marginTop:4}}>Developed with care by{" "}
           <span title="Developed by Adhithya J" style={{cursor:"pointer",color:"#e2e8f0",fontWeight:600,borderBottom:"1px dashed #a0aec0"}}>SDC</span>
         </div>
