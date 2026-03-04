@@ -59,6 +59,11 @@ async function extractTextFromPDF(file) {
   }
   fullText = fullText.replace(/(\d{9,})\1+/g, "");
   fullText = fullText.replace(/\d{14,}/g, "");
+  // Remove repeating alphanumeric watermark patterns (e.g. T25Z239T25Z239T25Z239...)
+  // Matches any 3-12 char alphanumeric chunk that repeats 3+ times consecutively
+  fullText = fullText.replace(/([A-Za-z0-9]{3,12})\1{2,}/g, "");
+  // Remove remaining long alphanumeric strings with no spaces (likely watermarks/IDs)
+  fullText = fullText.replace(/[A-Za-z0-9]{30,}/g, "");
   fullText = fullText.replace(/[ \t]{3,}/g, " ");
   fullText = fullText.replace(/\n{4,}/g, "\n\n");
   return fullText;
@@ -720,8 +725,8 @@ export default function LabRecordApp() {
         .pr-lab-name{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:12pt;font-weight:700;letter-spacing:.2px;margin-bottom:6px}
         .pr-subtitle{font-size:12pt;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#666;margin:8px 0 4px}
         .pr-lab{font-family:Calibri, 'Segoe UI', Arial, sans-serif;font-size:12pt;font-weight:700;font-style:normal;color:#333;margin-top:6px}
-        .info-strip{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid #bbb;margin-bottom:10px}
-        .info-strip.row2{grid-template-columns:1.8fr 1.2fr 1fr 1fr;border-bottom:1px solid #bbb;margin-bottom:10px}
+        .info-strip{display:grid;grid-template-columns:2fr 1.2fr 1fr;border-bottom:1px solid #bbb;margin-bottom:10px}
+        .info-strip.row2{grid-template-columns:1.5fr 1fr 0.8fr 0.8fr;border-bottom:1px solid #bbb;margin-bottom:10px}
         .info-cell{padding:8px 10px;border-right:1px solid #bbb}
         .info-cell:last-child{border-right:none}
         .ic-label{font-size:12pt;font-weight:400;letter-spacing:1.2px;text-transform:uppercase;color:#888;margin-bottom:2px;font-family:Calibri, 'Segoe UI', Arial, sans-serif}
@@ -1140,11 +1145,11 @@ export default function LabRecordApp() {
                       <div className="info-strip">
                         <div className="info-cell"><div className="ic-label">Student Name</div><div className="ic-value">{si.name || ""}</div></div>
                         <div className="info-cell"><div className="ic-label">Register No</div><div className="ic-value">{effectiveRollNo}</div></div>
-                        <div className="info-cell"><div className="ic-label">Department</div><div className="ic-value">{si.department || si.branch || ""}</div></div>
                         <div className="info-cell"><div className="ic-label">Date</div><div className="ic-value">{labInfo.date || today}</div></div>
                       </div>
-                      <div className="info-strip row2" style={{gridTemplateColumns:"1.8fr 1.2fr 1fr"}}>
+                      <div className="info-strip row2">
                         <div className="info-cell"><div className="ic-label">Email</div><div className="ic-value">{si.email || ""}</div></div>
+                        <div className="info-cell"><div className="ic-label">Department</div><div className="ic-value">{si.department || si.branch || ""}</div></div>
                         <div className="info-cell"><div className="ic-label">Batch</div><div className="ic-value">{si.batch || ""}</div></div>
                         <div className="info-cell"><div className="ic-label">Degree</div><div className="ic-value">{si.degree || ""}</div></div>
                       </div>
