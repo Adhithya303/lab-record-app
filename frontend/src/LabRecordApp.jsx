@@ -447,6 +447,36 @@ export default function LabRecordApp() {
       // A4 proportions: 210 x 297 mm → render at exact pixel width for clean slicing
       const a4WidthPx = 794;  // 210mm at 96dpi
       clone.style.width = a4WidthPx + 'px';
+      clone.style.minWidth = a4WidthPx + 'px';
+      clone.style.maxWidth = a4WidthPx + 'px';
+      clone.style.overflow = 'visible';
+
+      // Force all child .pr-page elements to desktop width to prevent mobile CSS from shrinking them
+      const prPages = clone.querySelectorAll('.pr-page');
+      for (const pg of prPages) {
+        pg.style.width = a4WidthPx + 'px';
+        pg.style.minWidth = a4WidthPx + 'px';
+        pg.style.maxWidth = a4WidthPx + 'px';
+        pg.style.padding = '6mm 18mm 18mm 18mm';
+        pg.style.boxSizing = 'border-box';
+      }
+
+      // Force info-strip grids to desktop layout (mobile CSS collapses columns)
+      const infoStrips = clone.querySelectorAll('.info-strip');
+      for (const strip of infoStrips) {
+        if (strip.classList.contains('row2')) {
+          strip.style.gridTemplateColumns = '1.5fr 1fr 0.8fr 0.8fr';
+        } else {
+          strip.style.gridTemplateColumns = '2fr 1.2fr 1fr';
+        }
+        strip.style.marginBottom = '10px';
+      }
+      const infoCells = clone.querySelectorAll('.info-cell');
+      for (const cell of infoCells) {
+        cell.style.padding = '8px 10px';
+        cell.style.borderBottom = 'none';
+      }
+
       document.body.appendChild(clone);
 
       const canvas = await window.html2canvas(clone, {
@@ -549,14 +579,15 @@ export default function LabRecordApp() {
 
       let srcY = 0;
       const usableHPx = (usableH / ratio) * scaleFactor;
+      let isFirstPage = true;
       while (srcY < canvas.height - 1) {
         const remainingPx = canvas.height - srcY;
 
         // Skip if only a tiny sliver remains (avoids blank trailing page)
-        if (remainingPx < 50) break;
+        if (remainingPx < 80) break;
 
         // Skip if remaining region is blank whitespace
-        if (isBlankRegion(mainCtx, srcY, remainingPx, canvas.width)) break;
+        if (isBlankRegion(mainCtx, srcY, Math.min(remainingPx, usableHPx), canvas.width)) break;
 
         const desiredPx = Math.min(usableHPx, remainingPx);
         const preferredBreak = srcY + desiredPx;
@@ -591,6 +622,12 @@ export default function LabRecordApp() {
         const slicePx = breakY - srcY;
         const sliceH = (slicePx / scaleFactor) * ratio;
 
+        // Skip this slice if it's essentially blank (avoids empty pages in between)
+        if (!isFirstPage && isBlankRegion(mainCtx, srcY, slicePx, canvas.width)) {
+          srcY = breakY;
+          continue;
+        }
+
         const slice = document.createElement("canvas");
         slice.width = canvas.width;
         slice.height = Math.ceil(slicePx);
@@ -599,17 +636,18 @@ export default function LabRecordApp() {
         sCtx.fillRect(0, 0, slice.width, slice.height);
         sCtx.drawImage(canvas, 0, Math.floor(srcY), canvas.width, Math.ceil(slicePx), 0, 0, canvas.width, Math.ceil(slicePx));
 
+        // Add new page only for non-first slices
+        if (!isFirstPage) {
+          doc.addPage();
+        }
+
         // Content image first — use JPEG with compression for smaller file size
         doc.addImage(slice.toDataURL("image/jpeg", 0.6), "JPEG", margin, margin, usableW, sliceH, undefined, 'FAST');
         // Then overlays ON TOP with transparency
         drawPageOverlays();
 
+        isFirstPage = false;
         srcY = breakY;
-        // Only add a new page if meaningful (non-blank) content remains
-        const nextRemaining = canvas.height - srcY;
-        if (nextRemaining > 50 && !isBlankRegion(mainCtx, srcY, nextRemaining, canvas.width)) {
-          doc.addPage();
-        }
       }
       const name = si.name ? si.name.replace(/\s+/g, "_") : "student";
       const week = labInfo.weekNo ? labInfo.weekNo.replace(/\s+/g, "_") : "lab";
@@ -718,6 +756,26 @@ export default function LabRecordApp() {
         .pdf-generating .pdf-hide{visibility:hidden !important}
         .pdf-generating .pr-page{box-shadow:none !important}
         .pdf-generating .pr-page::before{display:none !important}
+
+        /* ══ FORCE DESKTOP LAYOUT DURING PDF GENERATION (fixes mobile PDF issues) ══ */
+        .pdf-generating .pr-page{width:210mm !important;min-height:297mm !important;padding:6mm 18mm 18mm 18mm !important;margin:0 auto !important}
+        .pdf-generating .pr-inst,.pdf-generating .pr-lab-name,.pdf-generating .pr-lab{font-size:12pt !important}
+        .pdf-generating .pr-subtitle{font-size:12pt !important;letter-spacing:2.5px !important}
+        .pdf-generating .pr-header{padding:8px 0 10px !important;margin-bottom:12px !important}
+        .pdf-generating .info-strip{grid-template-columns:2fr 1.2fr 1fr !important;margin-bottom:10px !important}
+        .pdf-generating .info-strip.row2{grid-template-columns:1.5fr 1fr 0.8fr 0.8fr !important;margin-bottom:10px !important}
+        .pdf-generating .info-cell{padding:8px 10px !important;border-right:1px solid #bbb !important;border-bottom:none !important}
+        .pdf-generating .info-cell:last-child{border-right:none !important}
+        .pdf-generating .ic-label{font-size:12pt !important;letter-spacing:1.2px !important}
+        .pdf-generating .ic-value{font-size:12pt !important}
+        .pdf-generating .exp-strip{padding:14px 24px !important;flex-direction:row !important;gap:unset !important}
+        .pdf-generating .exp-right-block{text-align:right !important;padding-left:24px !important;border-left:1px solid #bbb !important}
+        .pdf-generating .score-meta-label{font-size:12pt !important}
+        .pdf-generating .pr-content-wrapper *{font-size:12pt !important}
+        .pdf-generating .pr-qa-head{break-after:avoid !important;page-break-after:avoid !important}
+        .pdf-generating .pr-rubric{page-break-inside:avoid !important;break-inside:avoid !important}
+        .pdf-generating .pr-rubric img{max-width:100% !important;height:auto !important}
+        .pdf-generating .page-wm-reg{font-size:0.7rem !important}
         .pr-content-wrapper{position:relative;z-index:2;flex:1;overflow:visible;font-size:12pt;line-height:1.5;font-family:Calibri, 'Segoe UI', Arial, sans-serif;color:#000}
         .pr-content-wrapper *{color:#000 !important;font-family:Calibri, 'Segoe UI', Arial, sans-serif !important;font-size:12pt}
         .pr-header{text-align:center;padding:8px 0 10px;border-bottom:2px solid #1c1c1c;margin-bottom:12px}
