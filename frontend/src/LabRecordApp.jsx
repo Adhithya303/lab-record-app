@@ -843,6 +843,11 @@ export default function LabRecordApp() {
         .watermark-br{bottom:10px;right:10px}
         @media print{.no-print{display:none!important}body{background:#fff!important}.wrap{padding:0!important;max-width:100%!important}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 
+        /* ══ Footer credit hover effect ══ */
+        .footer-credit{cursor:pointer;position:relative;display:inline-block;transition:all .3s ease}
+        .footer-credit::before{content:'Developed by Adhithya J';position:absolute;left:0;top:-22px;background:#1c1c1c;color:#a0aec0;padding:4px 10px;border-radius:4px;font-size:.85rem;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .3s ease}
+        .footer-credit:hover::before,.footer-credit:active::before{opacity:1}
+
         /* ══ MOBILE RESPONSIVE ══ */
         @media(max-width:768px){
           .wrap{padding:20px 16px 60px;max-width:100%}
@@ -1277,7 +1282,7 @@ export default function LabRecordApp() {
       <footer className="no-print" style={{background:"#2d3748",color:"#a0aec0",padding:"18px 24px",textAlign:"center",fontSize:".93rem",lineHeight:1.7,marginTop:"auto",position:"sticky",bottom:0,zIndex:10}}>
         <div>© 2026 PSG iTech. All rights reserved.</div>
         <div style={{marginTop:4}}>Developed with care by{" "}
-          <span title="Developed by Adhithya J" style={{cursor:"pointer",color:"#e2e8f0",fontWeight:600,borderBottom:"1px dashed #a0aec0"}}>SDC</span>
+          <span className="footer-credit" style={{color:"#e2e8f0",fontWeight:600,borderBottom:"1px dashed #a0aec0"}}>SDC</span>
         </div>
       </footer>
     </div>
